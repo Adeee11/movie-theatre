@@ -10,6 +10,7 @@ const Header = ({ siteTitle }) => (
     }}
   >
     <div
+      className="d-flex align-items-center justify-content-between"
       style={{
         margin: `0 auto`,
         maxWidth: 960,
@@ -27,6 +28,9 @@ const Header = ({ siteTitle }) => (
           {siteTitle}
         </Link>
       </h1>
+      <div>
+        <Link className="text-white" to="/admin">Admin</Link>
+      </div>
     </div>
   </header>
 )
