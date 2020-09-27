@@ -1,16 +1,16 @@
-import { AdminLayout } from "../../components/AdminLayout"
-import React from "react"
-import SEO from "../../components/seo"
 import { Button, Input, Select, Table } from "antd"
-const { Option } = Select
-export default function SiderDemo() {
+import React from "react"
+import { AdminLayout } from "../../components/AdminLayout"
+import SEO from "../../components/seo"
+const {Option} = Select;
+export default function Movies() {
   const dataSource = [
     {
       key: "1",
-      screen: "S1",
+      moviecode: "S1",
       movie: "Ready Player One",
-      seats: 10,
-      show: "8:00pm",
+      rating: 7.2,
+      language: "English",
       edit: (
         <a
           onClick={() => {
@@ -24,10 +24,10 @@ export default function SiderDemo() {
     },
     {
       key: "2",
-      screen: "S2",
+      moviecode: "S2",
       movie: "Fantastic Four",
-      seats: 30,
-      show: "2:00pm",
+      rating: 9,
+      language: "English",
       edit: <a>Edit</a>,
       delete: <a>Delete</a>,
     },
@@ -35,26 +35,25 @@ export default function SiderDemo() {
 
   const columns = [
     {
-      title: "Screen No.",
-      dataIndex: "screen",
-      key: "screen",
+      title: "Movie Code",
+      dataIndex: "moviecode",
+      key: "moviecode",
     },
     {
-      title: "Moview",
+      title: "Movie Name",
       dataIndex: "movie",
       key: "movie",
     },
     {
-      title: "Seats Left",
-      dataIndex: "seats",
-      key: "seats",
+      title: "Rating",
+      dataIndex: "rating",
+      key: "rating",
     },
     {
-      title: "Show Time",
-      dataIndex: "show",
-      key: "show",
+      title: "Language",
+      dataIndex: "language",
+      key: "language",
     },
-
     {
       title: "Edit",
       dataIndex: "edit",
@@ -68,37 +67,37 @@ export default function SiderDemo() {
   ]
 
   return (
-    <AdminLayout title="Screens">
-      <SEO title="Manage Screens" />
+    <AdminLayout title="Movies">
+      <SEO title="Manage Movies" />
       <Table dataSource={dataSource} columns={columns} />
       <div className="py-3 px-4 bg-white">
-        <h4>Add a New Screen</h4>
+        <h4>Add a New Movie</h4>
         <div className="row">
           <div className="col-md-3">
-            <Input placeholder="Screen Name" />
-            <Input className="mt-3" placeholder="Capacity" />
+            <Input placeholder="Movie Name" />
+            <Input className="mt-2" placeholder="Movie Code" />
           </div>
           <div className="col-md-3">
-            <Input placeholder="Show Time" />
-            <Input className="mt-3" placeholder="Size" />
+            <Input placeholder="Rating" />
+           
           </div>
           <div className="col-md-3">
-            <Input placeholder="Type" />
+            {/* <Input placeholder="Type" /> */}
             <Select
-                
               showSearch
-              className="w-100 mt-3"
-              placeholder="Select a Movie"
+              className="w-100"
+              placeholder="Select a Language"
               aria-autocomplete="none"
               optionFilterProp="children"
             >
-              <Option value="jack">Fantastic Four</Option>
-              <Option value="lucy">Ready Player one</Option>
-
+              <Option value="English">English</Option>
+              <Option value="Punjabi">Punjabi</Option>
             </Select>
           </div>
           <div className="col-md-3">
-            <Button className="w-100" type="primary">Add Screen</Button>
+            <Button className="w-100" type="primary">
+              Add Screen
+            </Button>
           </div>
         </div>
       </div>

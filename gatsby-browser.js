@@ -5,3 +5,5 @@
  */
 
 // You can delete this file if you're not using it
+import 'antd/dist/antd.css';
+import "./src/styles/styles.css"
