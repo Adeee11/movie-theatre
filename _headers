@@ -1,0 +1,4 @@
+/admin
+  Basic-Auth: admin:admin
+/admin/*
+  Basic-Auth: admin:admin
