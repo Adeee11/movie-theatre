@@ -10,67 +10,73 @@ const { Header, Content } = Layout
 const { Option } = Select
 
 const initializeData = () => {
-  if (!localStorage.getItem("theatre")) {
-    localStorage.setItem("theatre", "initialized")
-    const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
-    db.transaction(tx => {
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS Movie (Movie_Code not null primary key, Movie_Name,Rating,Language);"
-      )
-      tx.executeSql(
-        'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (1, "avengers","U","EN");'
-      )
-      tx.executeSql(
-        'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (2, "avatar","U/A","EN");'
-      )
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS Staff (Staff_ID  int(10) not null primary key,Salary int(15)  ,Department char(15) ,Staff_Name char(30) not null,Designation varchar(30) not null,Contact varchar(15) not null,Shift varchar(15) );"
-      )
-      tx.executeSql(
-        'INSERT INTO Staff (Staff_ID,Salary,Department,Staff_Name,Designation,Contact,Shift) values(121,10000,"Ticket", "AAA","distributor","9876543210","First");'
-      )
-      tx.executeSql(
-        "CREATE TABLE Screen (Screen_No int(15) not null primary key, Capacity int(4) not null, Screen_Size int(15) not null, Screen_Type ENUM(10),  Price int(5), Class ENUM(2), Staff_ID int(10));"
-      )
-      tx.executeSql(
-        'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (1, 150,"70*50","2D",150,"First",121);'
-      )
-      tx.executeSql(
-        'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (2, 150,"70*50","2D",150,"First",121);'
-      )
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability , primary key (Movie_Code , Screen_No ,show_time)) ;"
-      )
-      tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00pm",149);'
-      )
-      tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00pm",149);'
-      )
-      tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00pm",149);'
-      )
-      tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00pm",149);'
-      )
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS Ticket ( Ticket_ID int(10) not null primary key,Seat_No varchar(15) not null,Count int(10),Movie_Code int(15) not null, Staff_ID int(10) not null,Screen_No int(10) not null);"
-      )
-      tx.executeSql('INSERT INTO Ticket values(1,"1",1,1,121,1);')
-      tx.executeSql(
-        "CREATE TABLE Viewers (Viewer_SNO int(10) not null primary key, Name char(20) not null, Contact int(15) not null, Ticket_ID int(10) not null );"
-      )
-      tx.executeSql(
-        "create Table Ticket_Movie_Staff_Viewer(Ticket_ID , Movie_Code, Staff_ID, Viewer_SNO);"
-      )
-      tx.executeSql("insert into Ticket_Movie_Staff_Viewer Values(1,1,121,1);")
-      tx.executeSql("insert into Ticket_Movie_Staff_Viewer Values(2,1,121,2);")
-      tx.executeSql("create Table Screen_Staff(Screen_No,Staff_ID);")
-      tx.executeSql("insert into Screen_Staff values(1,122);")
-    })
-  }
+  return new Promise((res, rej) => {
+    if (!localStorage.getItem("theatre")) {
+      localStorage.setItem("theatre", "initialized")
+      const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
+      db.transaction(tx => {
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS Movie (Movie_Code not null primary key, Movie_Name,Rating,Language);"
+        )
+        tx.executeSql(
+          'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (1, "avengers","U","EN");'
+        )
+        tx.executeSql(
+          'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (2, "avatar","U/A","EN");'
+        )
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS Staff (Staff_ID  int(10) not null primary key,Salary int(15)  ,Department char(15) ,Staff_Name char(30) not null,Designation varchar(30) not null,Contact varchar(15) not null,Shift varchar(15) );"
+        )
+        tx.executeSql(
+          'INSERT INTO Staff (Staff_ID,Salary,Department,Staff_Name,Designation,Contact,Shift) values(121,10000,"Ticket", "AAA","distributor","9876543210","First");'
+        )
+        tx.executeSql(
+          "CREATE TABLE Screen (Screen_No int(15) not null primary key, Capacity int(4) not null, Screen_Size int(15) not null, Screen_Type ENUM(10),  Price int(5), Class ENUM(2), Staff_ID int(10));"
+        )
+        tx.executeSql(
+          'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (1, 150,"70*50","2D",150,"First",121);'
+        )
+        tx.executeSql(
+          'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (2, 150,"70*50","2D",150,"First",121);'
+        )
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability , primary key (Movie_Code , Screen_No ,show_time)) ;"
+        )
+        tx.executeSql(
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00pm",149);'
+        )
+        tx.executeSql(
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00pm",149);'
+        )
+        tx.executeSql(
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00pm",149);'
+        )
+        tx.executeSql(
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00pm",149);'
+        )
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS Ticket ( Ticket_ID int(10) not null primary key,Seat_No varchar(15) not null,Count int(10),Movie_Code int(15) not null, Staff_ID int(10) not null,Screen_No int(10) not null);"
+        )
+        tx.executeSql('INSERT INTO Ticket values(1,"1",1,1,121,1);')
+        tx.executeSql(
+          "CREATE TABLE Viewers (Viewer_SNO int(10) not null primary key, Name char(20) not null, Contact int(15) not null, Ticket_ID int(10) not null );"
+        )
+        tx.executeSql(
+          "create Table Ticket_Movie_Staff_Viewer(Ticket_ID , Movie_Code, Staff_ID, Viewer_SNO);"
+        )
+        tx.executeSql(
+          "insert into Ticket_Movie_Staff_Viewer Values(1,1,121,1);"
+        )
+        tx.executeSql(
+          "insert into Ticket_Movie_Staff_Viewer Values(2,1,121,2);"
+        )
+        tx.executeSql("create Table Screen_Staff(Screen_No,Staff_ID);")
+        tx.executeSql("insert into Screen_Staff values(1,122);")
+        res()
+      }, rej)
+    }
+  })
 }
-
 
 function IndexPage() {
   const [dataSource, setDataSource] = useState([
@@ -132,7 +138,6 @@ function IndexPage() {
       })
     )
   }
-  initializeData()
 
   const [showTimes, setShowTimes] = useState<{ show_time: string }[]>([])
   const [availableTickets, setAvailableTickets] = useState(0)
@@ -164,8 +169,9 @@ function IndexPage() {
   })
   useEffect(() => {
     // initializeData()
-
-    fetchAvailableMovies()
+    initializeData().then(() => {
+      fetchAvailableMovies()
+    })
   }, [])
   useEffect(() => {
     if (selectedMove && selectedShowTime) {
