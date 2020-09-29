@@ -74,6 +74,8 @@ const initializeData = () => {
         tx.executeSql("insert into Screen_Staff values(1,122);")
         res()
       }, rej)
+    }else {
+      res()
     }
   })
 }
@@ -192,7 +194,7 @@ function IndexPage() {
       const ticketRes = await callSQL(
         "Select Ticket_ID From Ticket ORDER BY Ticket_ID DESC LIMIT 1;"
       )
-      console.log(ticketRes)
+     
       let ticketId = 0
       if (result[0]) {
         ticketId = ticketRes[0].Ticket_ID
@@ -243,7 +245,7 @@ function IndexPage() {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <SEO title="Moview Theatre" />
+      <SEO title="Multiplex Management System" />
       <Helmet>
         <link
           rel="stylesheet"
