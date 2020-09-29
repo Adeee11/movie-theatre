@@ -5,6 +5,81 @@ import SEO from "../components/seo"
 
 const { Header, Content } = Layout
 const { Option } = Select
+
+const callSQL = (input: string) => {
+  return new Promise<any>((res, rej) => {
+    const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
+    db.transaction(tx => {
+      tx.executeSql(input, [], (result, results) => {
+        return res(Object.values(results.rows))
+      })
+    }, rej)
+  })
+}
+
+const initializeData = () => {
+  if(!localStorage.getItem("theatre")){
+    localStorage.setItem("theatre", "initialized");
+    const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
+    db.transaction(tx => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Movie (Movie_Code not null primary key, Movie_Name,Rating,Language);"
+      )
+      tx.executeSql(
+        'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (1, "avengers","U","EN");'
+      )
+      tx.executeSql(
+        'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (2, "avatar","U/A","EN");'
+      )
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Staff (Staff_ID  int(10) not null primary key,Salary int(15)  ,Department char(15) ,Staff_Name char(30) not null,Designation varchar(30) not null,Contact varchar(15) not null,Shift varchar(15) );"
+      )
+      tx.executeSql(
+        'INSERT INTO Staff (Staff_ID,Salary,Department,Staff_Name,Designation,Contact,Shift) values(121,10000,"Ticket", "AAA","distributor","9876543210","First");'
+      )
+      tx.executeSql(
+        "CREATE TABLE Screen (Screen_No int(15) not null primary key, Capacity int(4) not null, Screen_Size int(15) not null, Screen_Type ENUM(10),  Price int(5), Class ENUM(2), Staff_ID int(10));"
+      )
+      tx.executeSql(
+        'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (1, 150,"70*50","2D",150,"First",121);'
+      )
+      tx.executeSql(
+        'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (2, 150,"70*50","2D",150,"First",121);'
+      )
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability) ;"
+      )
+      tx.executeSql(
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00",149);'
+      )
+      tx.executeSql(
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00",149);'
+      )
+      tx.executeSql(
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00",149);'
+      )
+      tx.executeSql(
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00",149);'
+      )
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Ticket ( Ticket_ID int(10) not null primary key,Seat_No varchar(15) not null,Count int(10),Movie_Code int(15) not null, Staff_ID int(10) not null,Screen_No int(10) not null);"
+      )
+      tx.executeSql('INSERT INTO Ticket values(1,"1",1,1,121,1);')
+      tx.executeSql(
+        "CREATE TABLE Viewers (Viewer_SNO int(10) not null primary key, Name char(20) not null, Contact int(15) not null, Ticket_ID int(10) not null );"
+      )
+      tx.executeSql(
+        "create Table Ticket_Movie_Staff_Viewer(Ticket_ID , Movie_Code, Staff_ID, Viewer_SNO);"
+      )
+      tx.executeSql("insert into Ticket_Movie_Staff_Viewer Values(1,1,121,1);")
+      tx.executeSql("insert into Ticket_Movie_Staff_Viewer Values(2,1,121,2);")
+      tx.executeSql("create Table Screen_Staff(Screen_No,Staff_ID);")
+      tx.executeSql("insert into Screen_Staff values(1,122);")
+    })
+  }
+
+}
+
 function IndexPage() {
   const [dataSource, setDataSource] = useState([
     {
@@ -43,78 +118,126 @@ function IndexPage() {
     { title: "Language", dataIndex: "language", key: "language" },
   ]
 
-  const [movies, setMovies] = useState<any []>([])
-
-  const fetchMoviesFromDb = () => {
-    const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
-    db.transaction(tx => {
-      tx.executeSql("Select Movie_Name from Movie;", [], (tx, results) => {
-        setDataSource(Object.values(results.rows) as any)
+  const fetchAvailableMovies = async () => {
+    const example = {
+      Movie_Name: "avengers",
+      show_time: "02:00",
+      Availability: 149,
+      Language: "EN",
+    }
+    const results: typeof example[] = await callSQL(
+      "select Movie.Movie_Name,Screen_Movie.show_time,Screen_Movie.Availability,Movie.Language from (Movie INNER JOIN screen_movie ON Movie.Movie_Code=Screen_Movie.Movie_Code);"
+    )
+    setDataSource(
+      results.map((item, i) => {
+        return {
+          key: i.toFixed(),
+          language: item.Language,
+          movie: item.Movie_Name,
+          show: item.show_time,
+          tickets: item.Availability,
+        }
       })
-    })
+    )
+  }
+  initializeData();
+  const [movies, setMovies] = useState<{ Movie_Name: string }[]>([])
+
+  const [showTimes, setShowTimes] = useState<{ show_time: string }[]>([])
+  const [availableTickets, setAvailableTickets] = useState(0)
+  const fetchMoviesFromDb = async () => {
+    const data = await callSQL("SELECT Movie_Name from Movie;")
+
+    setMovies(data)
   }
 
-  useEffect(() => {
-    fetchMoviesFromDb();
-  }, [])
-  console.log(movies, "moveies")
-  // useEffect(() => {
-  //   const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
-  //   db.transaction(
-  //     tx => {
-  //       // tx.executeSql(
-  //       //   "CREATE TABLE IF NOT EXISTS movie (movie_code unique, Movie_name,rating,Language)"
-  //       // )
-  //       // tx.executeSql(
-  //       //   'INSERT INTO movie (movie_code, Movie_name,rating,Language) VALUES (3, "avengers","U","EN")'
-  //       // )
-  //       // tx.executeSql(
-  //       //   'INSERT INTO movie (movie_code, Movie_name,rating,Language) VALUES (4, "avatar","U/A","EN")'
-  //       // )
-  //       // tx.executeSql(
-  //       //   "CREATE TABLE IF NOT EXISTS screen (screen_number unique, capacity,screen_size,Screen_type)"
-  //       // )
-  //       // tx.executeSql(
-  //       //   'INSERT INTO screen (screen_number, capacity,screen_size,Screen_type) VALUES (1, 150,"70*50","2D")'
-  //       // )
-  //       // tx.executeSql(
-  //       //   'INSERT INTO screen (screen_number, capacity,screen_size,Screen_type) VALUES (2, 150,"70*50","2D")'
-  //       // )
-  //       tx.executeSql(
-  //         "CREATE TABLE IF NOT EXISTS screen_movie (movie_code , screen_number ,show_time)"
-  //       )
-  //       tx.executeSql(
-  //         'INSERT INTO screen_movie (movie_code, screen_number ,show_time) VALUES (1,1, "02:00")'
-  //       )
-  //       tx.executeSql(
-  //         'INSERT INTO screen_movie (movie_code, screen_number ,show_time) VALUES (1,1, "06:00")'
-  //       )
-  //       tx.executeSql(
-  //         'INSERT INTO screen_movie (movie_code, screen_number ,show_time) VALUES (2,2, "03:00")'
-  //       )
-  //       tx.executeSql(
-  //         'INSERT INTO screen_movie (movie_code, screen_number ,show_time) VALUES (2,2, "07:00")'
-  //       )
-  //       tx.executeSql(
-  //         "Select movie.Movie_Name as movie_name, Screen_movie.Screen_number as Screen_number , Screen_movie.show_time as show_time From (movie INNER JOIN Screen_movie on movie.Movie_Code = Screen_movie.Screen_number)",
-  //         [],
-  //         function (tx, results) {
-  //           //  msg = "<p>Found rows: " + len + "</p>";
-  //           //  document.querySelector('#status').innerHTML +=  msg;
+  const fetchShowTimes = async (movieName: string) => {
+    const data = await callSQL(
+      `Select Show_Time from Screen_Movie where Movie_Code  = (select Movie_Code  from Movie where  Movie_Name = "${movieName}");`
+    )
 
-  //           console.log(results)
-  //         },
-  //         null
-  //       )
-  //       // tx.executeSql(
-  //       //   'INSERT INTO movie (movie_code, Movie_name,rating,Language) VALUES (1, "avatar”,”U/A”,”EN")'
-  //       // )
-  //     },
-  //     er => {
-  //       console.log(er)
-  //     }
-  //   )
-  // }, [])
+    setShowTimes(data)
+  }
+  const fetchAvailableTickets = async (movieName: string, show: string) => {
+    const data = await callSQL(
+      `select Availability from Screen_Movie where Movie_Code = (select Movie_Code from Movie where  Movie_Name = "${movieName}") and Show_Time = "${show}";`
+    )
+    if(data[0]){
+      setAvailableTickets(data[0].Availability)
+    }
+  }
+  const [
+    { contact, selectedMove, selectedShowTime, viewerName, tickets },
+    setState,
+  ] = useState({
+    selectedMove: "",
+    selectedShowTime: "",
+    viewerName: "",
+    contact: "",
+    tickets: 0,
+  })
+  useEffect(() => {
+    // initializeData()
+    fetchMoviesFromDb()
+    fetchAvailableMovies()
+  }, [])
+  useEffect(() => {
+    if (selectedMove && selectedShowTime) {
+      fetchAvailableTickets(selectedMove, selectedShowTime)
+    }
+  }, [selectedMove, selectedShowTime])
+
+  const handleReservation = async () => {
+    try {
+      const result = await callSQL(
+        "SELECT Viewer_SNO  FROM Viewers ORDER BY Viewer_SNO DESC LIMIT 1;"
+      )
+      console.log(result)
+      let viewerId = 0
+      if (result[0]) {
+        viewerId = result[0].Viewer_SNO
+      }
+      const ticketRes = await callSQL(
+        "Select Ticket_ID From Ticket ORDER BY Ticket_ID DESC LIMIT 1;"
+      )
+      console.log(ticketRes)
+      let ticketId = 0
+      if (result[0]) {
+        ticketId = ticketRes[0].Ticket_ID
+      }
+      const newViewId = viewerId + 1
+      const newticketId = ticketId + 1
+      console.log(newViewId, viewerName, contact, newticketId)
+      await callSQL(
+        `Insert into Viewers values (${newViewId},"${viewerName}","${contact}", ${newticketId});`
+      )
+      await callSQL(
+        `Insert into Ticket values (${newticketId}, ${newticketId}, ${tickets} ,(select Movie_Code from Movie where  Movie_Name = "${selectedMove}"), 1 ,(select Screen_No from Screen_Movie  where Movie_Code = (select Movie_Code  from Movie where  Movie_Name = "${selectedMove}") and Show_Time = "${selectedShowTime}")); `
+      )
+      await callSQL(`
+      Update Screen_Movie set Availability = ((select Availability from Screen_Movie where Movie_Code = (select Movie_Code from Movie where  Movie_Name = "${selectedMove}") 
+      and Show_Time = "${selectedShowTime}")- ${tickets}) where 
+      Movie_Code = (select Movie_Code from Movie where  Movie_Name = "${selectedMove}") and 
+      Show_Time = "${selectedShowTime}" ;
+      `)
+      await callSQL(`
+      Insert into Ticket_Movie_Staff_Viewer values (${newticketId},(select Movie_Code  from Movie where  Movie_Name = "${selectedMove}"),1, ${newViewId})
+      `)
+      await fetchMoviesFromDb()
+      await fetchAvailableMovies()
+      setState({
+        contact: "",
+        selectedMove: "",
+        selectedShowTime: "",
+        tickets: 0,
+        viewerName: "",
+      })
+      setAvailableTickets(0);
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <SEO title="Moview Theatre" />
@@ -146,19 +269,32 @@ function IndexPage() {
                   showSearch
                   className="w-100"
                   placeholder="Pick a Movie"
+                  value={selectedMove}
                   aria-autocomplete="none"
+                  onChange={val => {
+                    fetchShowTimes(val.toString())
+                    setState(old => ({ ...old, selectedMove: val.toString() }))
+                  }}
                   optionFilterProp="children"
                 >
                   {movies &&
                     movies.map(item => {
                       return (
-                        <Option value={item.Movie_name}>
-                          {item.Movie_name}
+                        <Option key={item.Movie_Name} value={item.Movie_Name}>
+                          {item.Movie_Name}
                         </Option>
                       )
                     })}
                 </Select>
-                <Input className="mt-3" placeholder="Viewer Name" />
+                <Input
+                  className="mt-3"
+                  onChange={e => {
+                    const val = e.target.value
+                    setState(old => ({ ...old, viewerName: val }))
+                  }}
+                  value={viewerName}
+                  placeholder="Viewer Name"
+                />
               </div>
               <div className="col-md-3">
                 <Select
@@ -166,17 +302,63 @@ function IndexPage() {
                   className="w-100"
                   placeholder="Pick a Show"
                   aria-autocomplete="none"
+                  value={selectedShowTime}
+                  onChange={val => {
+                    setState(old => ({
+                      ...old,
+                      selectedShowTime: val.toString(),
+                    }))
+                  }}
                   optionFilterProp="children"
                 >
-                  <Option value="jack">2:00 pm</Option>
-                  <Option value="lucy">3:00 pm</Option>
+                  {showTimes.map((item, i) => {
+                    return (
+                      <Option key={i} value={item.show_time}>
+                        {item.show_time}
+                      </Option>
+                    )
+                  })}
                 </Select>
-                <Input className="mt-3" placeholder="Contact" />
+                <Input
+                  className="mt-3"
+                  type="tel"
+                  value={contact}
+                  onChange={e => {
+                    const val = e.target.value
+                    setState(old => ({ ...old, contact: val }))
+                  }}
+                  placeholder="Contact"
+                />
               </div>
-              <div className="col-md-3">Amount</div>
               <div className="col-md-3">
-                <Button className="w-100" type="primary">
-                  Buy Now
+                <div>
+                  <Input
+                    placeholder="Number of Ticker"
+                    value={tickets}
+                    onBlur={() => {
+                      if (tickets > availableTickets) {
+                        setState(old => ({ ...old, tickets: availableTickets }))
+                      }
+                    }}
+                    max={availableTickets}
+                    onChange={e => {
+                      const val = e.target.value
+                      setState(old => ({ ...old, tickets: parseInt(val) }))
+                    }}
+                    type="number"
+                  />
+                  {availableTickets > 0 &&
+                    `Only ${availableTickets} tickets available`}
+                </div>
+                {tickets > 0 && <div>Amount Rs{tickets * 150}</div>}
+              </div>
+              <div className="col-md-3">
+                <Button
+                  onClick={handleReservation}
+                  className="w-100"
+                  type="primary"
+                >
+                  Reserve
                 </Button>
               </div>
             </div>
