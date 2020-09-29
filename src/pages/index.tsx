@@ -129,7 +129,7 @@ function IndexPage() {
     },
     { title: "Language", dataIndex: "language", key: "language" },
   ]
-  const { movies, fetchMoviesFromDb } = useMovies()
+ 
   const fetchAvailableMovies = async () => {
     const example = {
       Movie_Name: "avengers",
@@ -192,7 +192,7 @@ function IndexPage() {
       fetchAvailableTickets(selectedMove, selectedShowTime)
     }
   }, [selectedMove, selectedShowTime])
-
+  const { movies, fetchMoviesFromDb } = useMovies()
   const handleReservation = async () => {
     try {
       const result = await callSQL(
