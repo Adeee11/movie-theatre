@@ -43,16 +43,16 @@ const initializeData = () => {
           "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability , primary key (Movie_Code , Screen_No ,show_time)) ;"
         )
         tx.executeSql(
-          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00pm",149);'
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00PM",149);'
         )
         tx.executeSql(
-          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00pm",149);'
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00PM",149);'
         )
         tx.executeSql(
-          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00pm",149);'
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00PM",149);'
         )
         tx.executeSql(
-          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00pm",149);'
+          'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00PM",149);'
         )
         tx.executeSql(
           "CREATE TABLE IF NOT EXISTS Ticket ( Ticket_ID int(10) not null primary key,Seat_No varchar(15) not null,Count int(10),Movie_Code int(15) not null, Staff_ID int(10) not null,Screen_No int(10) not null);"
