@@ -72,9 +72,43 @@ const initializeData = () => {
         )
         tx.executeSql("create Table Screen_Staff(Screen_No,Staff_ID);")
         tx.executeSql("insert into Screen_Staff values(1,122);")
+        tx.executeSql(
+          `INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (2, "Captain Marvel","U/A","EN");`
+        )
+        tx.executeSql(
+          'INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (2, "Dead Pool","U/A","EN"); '
+        )
+        tx.executeSql(`INSERT INTO Movie (Movie_Code, Movie_Name,Rating,Language) VALUES (2, "Black Panther","U/A","EN");
+         `)
+        tx.executeSql(
+          `INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (3,2, "09:00PM",149);`
+        )
+        tx.executeSql(
+          `INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (3,3, "01:00PM",149);`
+        )
+        tx.executeSql(
+          `INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (4,4, "03:00PM",149);`
+        )
+        tx.executeSql(
+          `INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (4,4, "09:00PM",149);`
+        )
+        tx.executeSql(
+          `INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (5,5, "11:00AM",149);`
+        )
+        tx.executeSql(
+          `INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (5,5, "07:00PM",149);`
+        )
+        tx.executeSql(`INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (3, 150,"70*50","3D",150,"First",121);
+         `)
+        tx.executeSql(
+          `INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (4, 150,"70*50","3D",150,"First",121);`
+        )
+        tx.executeSql(
+          `INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (5, 150,"70*50","2D",150,"First",121);`
+        )
         res()
       }, rej)
-    }else {
+    } else {
       res()
     }
   })
@@ -194,7 +228,7 @@ function IndexPage() {
       const ticketRes = await callSQL(
         "Select Ticket_ID From Ticket ORDER BY Ticket_ID DESC LIMIT 1;"
       )
-     
+
       let ticketId = 0
       if (result[0]) {
         ticketId = ticketRes[0].Ticket_ID
