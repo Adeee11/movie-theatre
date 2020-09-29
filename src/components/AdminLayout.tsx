@@ -1,9 +1,9 @@
 import { Layout, Menu } from "antd"
-import { DesktopOutlined, PieChartOutlined } from "@ant-design/icons"
+import { CodepenOutlined, DesktopOutlined, IdcardOutlined, MobileOutlined, PieChartOutlined, ShopOutlined } from "@ant-design/icons"
 import React, { useMemo, useState } from "react"
 import { Helmet } from "react-helmet"
 import { useLocation } from "@reach/router"
-import { navigate } from "gatsby"
+import { Link, navigate } from "gatsby"
 const { Header, Content, Sider } = Layout
 export function AdminLayout({
   children,
@@ -36,35 +36,22 @@ export function AdminLayout({
         collapsed={collapsed}
         onCollapse={val => setCollapsed(val)}
       >
-        <div className="logo" />
+        <div className="logo" onClick={() => navigate("/")} />
         <Menu selectedKeys={selectedKeys} theme="dark" mode="inline">
-          <Menu.Item
-            key="/admin"
-            onClick={() => navigate("/admin")}
-            icon={<PieChartOutlined />}
-          >
-            Manage Screens
+          <Menu.Item key="/admin" icon={<CodepenOutlined />}>
+            <Link className="text-decoration-none" to="/admin">Manage Screens</Link>
           </Menu.Item>
-          <Menu.Item
-            key="/admin/movies"
-            onClick={() => navigate("/admin/movies")}
-            icon={<DesktopOutlined />}
-          >
-            Manage Movies
+
+          <Menu.Item key="/admin/movies" icon={<MobileOutlined />}>
+            <Link className="text-decoration-none" to="/admin/movies">Manage Movies</Link>
           </Menu.Item>
-          <Menu.Item
-            key="/admin/tickets"
-            onClick={() => navigate("/admin/tickets")}
-            icon={<DesktopOutlined />}
-          >
-            Tickets Sold
+
+          <Menu.Item key="/admin/tickets" icon={<ShopOutlined />}>
+            <Link className="text-decoration-none" to="/admin/tickets">Tickets Sold</Link>
           </Menu.Item>
-          <Menu.Item
-            key="/admin/staff"
-            onClick={() => navigate("/admin/staff")}
-            icon={<DesktopOutlined />}
-          >
-            Manage Staff
+
+          <Menu.Item key="/admin/staff" icon={<IdcardOutlined />}>
+            <Link className="text-decoration-none" to="/admin/staff">Manage Staff</Link>
           </Menu.Item>
         </Menu>
       </Sider>

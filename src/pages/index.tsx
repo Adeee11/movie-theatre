@@ -1,25 +1,17 @@
-import { Button, Input, Layout, Select, Table } from "antd"
-import React, { useEffect, useState } from "react"
+import { Button, Input, Layout, Modal, notification, Select, Table } from "antd"
+import { Link } from "gatsby"
+import React, { useEffect, useMemo, useState } from "react"
 import { Helmet } from "react-helmet"
+import { callSQL } from "../components/callSQL"
 import SEO from "../components/seo"
+import { useMovies } from "../hooks"
 
 const { Header, Content } = Layout
 const { Option } = Select
 
-const callSQL = (input: string) => {
-  return new Promise<any>((res, rej) => {
-    const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
-    db.transaction(tx => {
-      tx.executeSql(input, [], (result, results) => {
-        return res(Object.values(results.rows))
-      })
-    }, rej)
-  })
-}
-
 const initializeData = () => {
-  if(!localStorage.getItem("theatre")){
-    localStorage.setItem("theatre", "initialized");
+  if (!localStorage.getItem("theatre")) {
+    localStorage.setItem("theatre", "initialized")
     const db = window.openDatabase("mydb", "1.0", "Test DB", 4 * 1024 * 1024)
     db.transaction(tx => {
       tx.executeSql(
@@ -47,19 +39,19 @@ const initializeData = () => {
         'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (2, 150,"70*50","2D",150,"First",121);'
       )
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability) ;"
+        "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability , primary key (Movie_Code , Screen_No ,show_time)) ;"
       )
       tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00",149);'
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00pm",149);'
       )
       tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00",149);'
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "06:00pm",149);'
       )
       tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00",149);'
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "03:00pm",149);'
       )
       tx.executeSql(
-        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00",149);'
+        'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (2,2, "07:00pm",149);'
       )
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS Ticket ( Ticket_ID int(10) not null primary key,Seat_No varchar(15) not null,Count int(10),Movie_Code int(15) not null, Staff_ID int(10) not null,Screen_No int(10) not null);"
@@ -77,8 +69,8 @@ const initializeData = () => {
       tx.executeSql("insert into Screen_Staff values(1,122);")
     })
   }
-
 }
+
 
 function IndexPage() {
   const [dataSource, setDataSource] = useState([
@@ -117,7 +109,7 @@ function IndexPage() {
     },
     { title: "Language", dataIndex: "language", key: "language" },
   ]
-
+  const { movies, fetchMoviesFromDb } = useMovies()
   const fetchAvailableMovies = async () => {
     const example = {
       Movie_Name: "avengers",
@@ -140,16 +132,10 @@ function IndexPage() {
       })
     )
   }
-  initializeData();
-  const [movies, setMovies] = useState<{ Movie_Name: string }[]>([])
+  initializeData()
 
   const [showTimes, setShowTimes] = useState<{ show_time: string }[]>([])
   const [availableTickets, setAvailableTickets] = useState(0)
-  const fetchMoviesFromDb = async () => {
-    const data = await callSQL("SELECT Movie_Name from Movie;")
-
-    setMovies(data)
-  }
 
   const fetchShowTimes = async (movieName: string) => {
     const data = await callSQL(
@@ -162,7 +148,7 @@ function IndexPage() {
     const data = await callSQL(
       `select Availability from Screen_Movie where Movie_Code = (select Movie_Code from Movie where  Movie_Name = "${movieName}") and Show_Time = "${show}";`
     )
-    if(data[0]){
+    if (data[0]) {
       setAvailableTickets(data[0].Availability)
     }
   }
@@ -178,7 +164,7 @@ function IndexPage() {
   })
   useEffect(() => {
     // initializeData()
-    fetchMoviesFromDb()
+
     fetchAvailableMovies()
   }, [])
   useEffect(() => {
@@ -225,6 +211,13 @@ function IndexPage() {
       `)
       await fetchMoviesFromDb()
       await fetchAvailableMovies()
+      Modal.success({
+        title: "Reservation Successfull",
+        content: (
+          <p>We have sent the reservation info on your contact {contact}</p>
+        ),
+      })
+
       setState({
         contact: "",
         selectedMove: "",
@@ -232,8 +225,12 @@ function IndexPage() {
         tickets: 0,
         viewerName: "",
       })
-      setAvailableTickets(0);
+      setAvailableTickets(0)
     } catch (e) {
+      Modal.error({
+        title: "Reservation Failed",
+        content: <p>Something Went Wront. Try again later</p>,
+      })
       console.log(e)
     }
   }
@@ -252,9 +249,12 @@ function IndexPage() {
       <Layout className="site-layout">
         <Header
           style={{ background: "#001529" }}
-          className="site-layout-background d-flex align-items-center"
+          className="site-layout-background d-flex justify-content-between align-items-center"
         >
-          <h3 className="text-white">Movie Theatre</h3>
+          <h3 className="text-white">Multiplex Management System</h3>
+          <Link className="text-white" to="/admin">
+            Admin
+          </Link>
         </Header>
         <Content>
           <div className="container mt-3">

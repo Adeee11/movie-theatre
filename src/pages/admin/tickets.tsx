@@ -1,9 +1,19 @@
 import { Button, Input, Select, Table } from "antd"
 import React from "react"
 import { AdminLayout } from "../../components/AdminLayout"
+import { callSQL } from "../../components/callSQL"
 import SEO from "../../components/seo"
 const { Option } = Select
 export default function Movies() {
+
+  const fetchTickets = async () => {
+    await callSQL(`Select Movie.Movie_Name, (((Select count(Movie_Code) from Screen_Movie where 
+    Movie_Code=(select Movie_Code  from Movie where Movie_Name= "avatar") group by Movie_Code )*150)) - (Select sum(Availability) from Screen_Movie where 
+    Movie_Code=(select Movie_Code  from Movie where Movie_Name= "avatar") group by Movie_code) ,  ((((Select count(Movie_Code) from Screen_Movie where 
+    Movie_Code=(select Movie_Code  from Movie where Movie_Name= "avatar") group by Movie_Code )*150)) - (Select sum(Availability) from Screen_Movie where 
+    Movie_Code=(select Movie_Code  from Movie where Movie_Name= "avatar") group by Movie_code) )* 150 from Movie;`)
+  }
+
   const dataSource = [
     {
       key: "1",
