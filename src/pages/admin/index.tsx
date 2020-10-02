@@ -262,13 +262,13 @@ export default function SiderDemo() {
               optionFilterProp="children"
             >
               {[
-                "9:00AM",
+                "09:00AM",
                 "11:00AM",
-                "1:00PM",
-                "3:00PM",
-                "5:00PM",
-                "6:00PM",
-                "9:00PM",
+                "01:00PM",
+                "03:00PM",
+                "05:00PM",
+                "06:00PM",
+                "09:00PM",
                 "11:00PM",
               ].map(show => {
                 return (

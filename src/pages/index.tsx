@@ -40,7 +40,7 @@ const initializeData = () => {
           'INSERT INTO Screen (Screen_No, capacity,screen_size,Screen_type,Price,Class,Staff_ID) VALUES (2, 150,"70*50","2D",150,"First",121);'
         )
         tx.executeSql(
-          "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability , primary key (Movie_Code , Screen_No ,show_time)) ;"
+          "CREATE TABLE IF NOT EXISTS Screen_Movie (Movie_Code , Screen_No ,show_time,Availability , primary key (Screen_No ,show_time)) ;"
         )
         tx.executeSql(
           'INSERT INTO Screen_Movie (Movie_Code, Screen_No ,show_time,Availability) VALUES (1,1, "02:00PM",149);'
@@ -175,11 +175,11 @@ function IndexPage() {
     { contact, selectedMove, selectedShowTime, viewerName, tickets },
     setState,
   ] = useState({
-    selectedMove: "",
-    selectedShowTime: "",
-    viewerName: "",
-    contact: "",
-    tickets: 0,
+    selectedMove: undefined,
+    selectedShowTime: undefined,
+    viewerName: undefined,
+    contact: undefined,
+    tickets: undefined,
   })
   useEffect(() => {
     // initializeData()
